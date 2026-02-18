@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType, split_nodes_delimiter, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -40,6 +40,21 @@ class TestTextNodeToHTML_NODE(unittest.TestCase):
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.value, None)
         self.assertEqual(html_node.props, {"src": "/cat.png", "alt": "cat picture"})
+
+
+class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_split_nodes_delimiter(self):
+        node = TextNode(
+            "This is text with a **bolded phrase** in the middle", TextType.REGULAR
+        )
+        split = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(len(split), 3)
+        self.assertEqual(split[0].text, "This is text with a ")
+        self.assertEqual(split[0].text_type, TextType.REGULAR)
+        self.assertEqual(split[1].text, "bolded phrase")
+        self.assertEqual(split[1].text_type, TextType.BOLD)
+        self.assertEqual(split[2].text, " in the middle")
+        self.assertEqual(split[2].text_type, TextType.REGULAR)
 
 
 if __name__ == "__main__":

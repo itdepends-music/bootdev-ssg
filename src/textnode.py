@@ -73,3 +73,57 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.REGULAR:
+            new_nodes.append(node)
+            continue
+
+        text_array = re.split(r"!\[.*?\]\(.*?\)", node.text)
+        images_array = extract_markdown_images(node.text)
+
+        text_nodes = [TextNode(text, TextType.REGULAR) for text in text_array]
+        image_nodes = [
+            TextNode(image[0], TextType.IMAGE, image[1]) for image in images_array
+        ]
+
+        nodes = []
+        for i in range(len(text_nodes)):
+            if text_nodes[i].text != "":  # discard empty nodes
+                nodes.append(text_nodes[i])
+
+            if i < len(image_nodes):
+                nodes.append(image_nodes[i])
+
+        new_nodes.extend(nodes)
+
+    return new_nodes
+
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.REGULAR:
+            new_nodes.append(node)
+            continue
+
+        text_array = re.split(r"\[.*?\]\(.*?\)", node.text)
+        link_array = extract_markdown_links(node.text)
+
+        text_nodes = [TextNode(text, TextType.REGULAR) for text in text_array]
+        link_nodes = [TextNode(link[0], TextType.LINK, link[1]) for link in link_array]
+
+        nodes = []
+        for i in range(len(text_nodes)):
+            if text_nodes[i].text != "":  # discard empty nodes
+                nodes.append(text_nodes[i])
+
+            if i < len(link_nodes):
+                nodes.append(link_nodes[i])
+
+        new_nodes.extend(nodes)
+
+    return new_nodes

@@ -1,3 +1,3 @@
-from textnode import TextNode, TextType
+from copy_static import copy_static
 
-print(TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev"))
+copy_static()
